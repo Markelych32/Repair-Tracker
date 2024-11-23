@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,4 +96,18 @@ public interface TaskController {
             @Parameter(name = "taskId", description = "Идентификатор пользователя", required = true, in = ParameterIn.HEADER)
             @RequestHeader(name = "taskId") UUID taskId
     );
+
+    @Operation(
+            summary = "Получение списка типов задач.",
+            description = "Возвращает список типов возможных задач.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Успешное получение типов задач",
+                            content = @Content(schema = @Schema(implementation = String.class))
+                    )
+            }
+    )
+    @GetMapping("/types")
+    ResponseEntity<?> getTypesTitles();
 }

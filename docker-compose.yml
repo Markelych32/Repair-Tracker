@@ -26,8 +26,8 @@ services:
       - "${DB_PORT:-5434}:5432"
     networks:
       - backend
-    volumes:
-      - bd-data:/var/lib/postgresql/data
+#    volumes:
+#      - bd-data:/var/lib/postgresql/data
 
   kafka-1:
     image: bitnami/kafka:3.6.2
@@ -43,8 +43,8 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-    volumes:
-      - kafka-1:/bitnami/kafka
+#    volumes:
+#      - kafka-1:/bitnami/kafka
     networks:
       - backend
 
@@ -62,8 +62,8 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-    volumes:
-      - kafka-2:/bitnami/kafka
+#    volumes:
+#      - kafka-2:/bitnami/kafka
     networks:
       - backend
 
@@ -81,8 +81,8 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-    volumes:
-      - kafka-3:/bitnami/kafka
+#    volumes:
+#      - kafka-3:/bitnami/kafka
     networks:
       - backend
 
@@ -120,6 +120,7 @@ services:
       SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka-1:9092, kafka-2:9094, kafka-3:9096
     depends_on:
       - database
+      - backend
       - kafka-1
       - kafka-2
       - kafka-3

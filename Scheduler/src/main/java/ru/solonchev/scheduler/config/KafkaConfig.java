@@ -35,8 +35,6 @@ public class KafkaConfig {
     private String linger;
     @Value("${spring.kafka.producer.properties.request.timeout.ms}")
     private String requestTimeout;
-    @Value("${spring.kafka.producer.properties.idempotence}")
-    private String idempotence;
 
     Map<String, Object> producerConfig() {
         Map<String, Object> config = new HashMap<>();
@@ -48,7 +46,6 @@ public class KafkaConfig {
         config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeout);
         config.put(ProducerConfig.LINGER_MS_CONFIG, linger);
         config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout);
-        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, idempotence);
 
         return config;
     }

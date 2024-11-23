@@ -35,4 +35,9 @@ public class TaskControllerImpl implements TaskController {
         taskService.deleteTask(taskId);
         return ResponseEntity.ok().body("Task deleted successfully");
     }
+
+    @Override
+    public ResponseEntity<?> getTypesTitles() {
+        return ResponseEntity.ok(taskService.findAllTypes());
+    }
 }

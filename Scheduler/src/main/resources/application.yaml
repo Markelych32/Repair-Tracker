@@ -16,11 +16,10 @@ spring:
       bootstrap-servers: localhost:9092,localhost:9094
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      acks: all
+      acks: 1
       properties:
         delivery.timeout.ms: 20000
         linger.ms: 0
-        idempotence: true
         request.timeout.ms: 10000
   task:
     scheduling:
