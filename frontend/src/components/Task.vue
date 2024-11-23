@@ -85,16 +85,24 @@ const isDone = ref(props.task.isDone)
 const editing = ref(false)
 const popupShowing = ref(false)
 
-const deleteTask = (id = props.task.id) => taskStore.deleteTask(id)
+const deleteTask = (id = props.task.id) => {
+  taskStore.deleteTask(id)
+}
 
 const editIsDone = (id = props.task.id, isDone = this.isDone) => {
   taskStore.editIsDone(id, isDone)
 }
 
-const editTitle = (
+const editTitle = async (
   id = props.task.id,
-  title = document.getElementById('title').value
+  title = document.getElementById('title')?.value,
+  payload = document.getElementById('payload-edit')?.value,
+  isDone = document.getElementById('done-edit')?.checked
 ) => {
+  if (props.task.title === null && title !== null) {
+    await taskStore.saveNewTask(id, title, payload, isDone)
+  }
+
   taskStore.editTitle(id, title)
   editing.value = !editing.value
 }
@@ -113,18 +121,22 @@ const editTask = (
 <style lang="scss" scoped>
 $main-bg-color: #17171a;
 $elem-bg-color: #3e4045;
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
 
 .task {
+  background-color: $elem-bg-color;
+  flex-direction: row;
+  border-radius: 10px;
+  align-items: center;
   position: relative;
+  display: flex;
   padding: 30px;
   margin: 15px 0;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 20px;
-  background-color: $elem-bg-color;
+
+  &:hover .delete {
+    opacity: 1;
+  }
 }
 
 h3 {
@@ -143,9 +155,13 @@ h2 {
 }
 .delete {
   z-index: 1;
+  justify-self: flex-end;
   background-color: transparent;
   border: none;
+  margin-left: auto;
+  opacity: 0;
   cursor: pointer;
+  transition: opacity 0.2s;
 
   img {
     width: 28px;
@@ -248,6 +264,7 @@ h2 {
 }
 .payload-edit {
   resize: vertical;
+  min-height: 60px;
   max-height: 250px;
 }
 </style>

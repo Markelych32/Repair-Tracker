@@ -1,45 +1,41 @@
 import AXIOS from '../axios.js'
 import { defineStore } from 'pinia'
+import { useGlobalState } from './GlobalStore.js'
+
+const globalState = useGlobalState()
 
 export const useTaskStore = defineStore('TaskStore', {
   state: () => {
     return {
-      tasks: [
-        {
-          id: 0,
-          title: '',
-          payload: '',
-          isDone: false,
-        },
-        {
-          id: 1,
-          title: 'test2',
-          payload: '',
-          isDone: false,
-        },
-        {
-          id: 2,
-          title: 'test3',
-          payload: '',
-          isDone: false,
-        },
-      ],
+      tasks: [],
+      tasks: [],
     }
   },
 
   actions: {
     async fetchData() {
-      const response = await AXIOS.get(
-        'http://localhost:8081/api/v1/users/' +
-          window.localStorage.getItem('userId')
-      )
-      this.tasks = response.data
+      try {
+        const response = await AXIOS.get(
+          `/users/${globalState.userId.value}/tasks`,
+          {
+            headers: {
+              Authorization: `Bearer ${globalState.token.value}`,
+            },
+          }
+        )
+
+        this.tasks = response.data.tasks
+      } catch (e) {}
     },
-    sendData() {
-      AXIOS.post(
-        'http://localhost:8081/api/v1/users/' +
-          window.localStorage.getItem('userId'),
-        this.tasks
+    async sendData(id, title, payload, isDone) {
+      const response = await AXIOS.put(
+        '/tasks',
+        { task_id: id, title: title, payload: payload, isDone: isDone },
+        {
+          headers: {
+            Authorization: `Bearer ${globalState.token.value}`,
+          },
+        }
       )
     },
     addNewTask(id) {
@@ -50,37 +46,104 @@ export const useTaskStore = defineStore('TaskStore', {
         isDone: false,
       })
     },
-    editTask(id, title, payload, isDone) {
-      const target = this.tasks.find((task) => task.id === id)
-      target.title = title
-      target.payload = payload
-      target.isDone = isDone
+
+    async saveNewTask(id, title, payload, isDone) {
+      await AXIOS.post(
+        '/tasks',
+        {
+          task_id: id,
+          user_id: globalState.userId.value,
+          title: title,
+          payload: payload,
+          isDone: isDone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${globalState.token.value}`,
+          },
+        }
+      )
     },
-    editIsDone(id, isDone) {
+
+    async editTask(id, title, payload, isDone) {
       const target = this.tasks.find((task) => task.id === id)
-      if (target) target.isDone = isDone
+
+      if (target) {
+        target.title = title
+        target.payload = payload
+        target.isDone = isDone
+
+        await this.sendData(id, title, payload, isDone)
+      }
+
+      if (target) {
+        target.title = title
+        target.payload = payload
+        target.isDone = isDone
+
+        await this.sendData(id, title, payload, isDone)
+      }
     },
-    editTitle(id, title) {
+
+    async editIsDone(id, isDone) {
       const target = this.tasks.find((task) => task.id === id)
-      if (target) target.title = title
+      if (target) {
+        target.isDone = isDone
+
+        this.sendData(id, target.title, target.payload, isDone)
+      }
+      if (target) {
+        target.isDone = isDone
+
+        this.sendData(id, target.title, target.payload, isDone)
+      }
     },
-    deleteTask(id) {
+
+    async editTitle(id, title) {
+      const target = this.tasks.find((task) => task.id === id)
+      if (target) {
+        target.title = title
+
+        this.sendData(id, title, target.payload, target.isDone)
+      }
+      if (target) {
+        target.title = title
+
+        this.sendData(id, title, target.payload, target.isDone)
+      }
+    },
+
+    async deleteTask(id) {
       this.tasks = this.tasks.filter((task) => task.id !== id)
+
+      await AXIOS.delete(`/tasks`, {
+        headers: {
+          Authorization: `Bearer ${globalState.token.value}`,
+          taskId: id,
+        },
+      })
+
+      await AXIOS.delete(`/tasks`, {
+        headers: {
+          Authorization: `Bearer ${globalState.token.value}`,
+          taskId: id,
+        },
+      })
     },
   },
 
   getters: {
     allTasks(state) {
-      return state.tasks
+      return state.tasks || []
     },
     completedTasks(state) {
-      return state.tasks.filter((task) => task.isDone)
+      return state.tasks.filter((task) => task.isDone) || []
     },
     totalTasks(state) {
       return state.tasks.length
     },
     activeTasks(state) {
-      return state.tasks.filter((task) => !task.isDone)
+      return state.tasks.filter((task) => !task.isDone) || []
     },
   },
 })

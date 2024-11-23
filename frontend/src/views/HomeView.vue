@@ -13,7 +13,7 @@ import TasksList from '@/components/TasksList.vue'
 <style lang="scss" scoped>
 $main-bg-color: #17171a;
 $elem-bg-color: #3e4045;
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
 
 .home {
   max-width: 80%;

@@ -1,9 +1,18 @@
 <template>
   <div class="header">
-    <h2 class="name">SpringBoard</h2>
+    <img
+      @click="router.push('/')"
+      class="name"
+      src="../assets/newlogo.png"
+      alt="SpringBoard"
+    />
     <div class="buttons">
-      <FilledButton @click="router.push('/login')" btnText="Log In" />
-      <OutlinedButton @click="logout" btnText="Log Out" />
+      <FilledButton
+        v-if="!globalState.token.value"
+        @click="router.push('/login')"
+        btnText="Log In"
+      />
+      <OutlinedButton v-else @click="logout" btnText="Log Out" />
     </div>
   </div>
 </template>
@@ -23,12 +32,12 @@ const logout = () => {
 <style lang="scss" scoped>
 $main-bg-color: #17171a;
 $elem-bg-color: #3e4045;
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
 
 .header {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
-  padding-top: 20px;
+  padding: 30px 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -36,14 +45,16 @@ $accent-color: #eab629;
 }
 
 .name {
-  color: $accent-color;
-  font-size: 26px;
-  font-weight: 300;
+  width: 320px;
+  cursor: pointer;
+  margin-left: 10%;
 }
 
 .buttons {
   display: flex;
   flex-direction: row;
   gap: 8px;
+  margin-right: 10%;
+  justify-self: flex-end;
 }
 </style>

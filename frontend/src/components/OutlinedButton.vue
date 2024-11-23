@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
 
 .button {
   color: $accent-color;
