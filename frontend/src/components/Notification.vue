@@ -1,39 +1,49 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="notification">
-      <span>{{ message }}</span>
+    <div v-if="globalState.notification.value" class="notification">
+      <span>{{ globalState.notification.value }}</span>
       <button @click="close">✕</button>
     </div>
   </transition>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
+import { useGlobalState } from '@/stores/GlobalStore'
 
-const props = defineProps({
-  message: {
-    type: String,
-    required: true,
-  },
-})
-
-const visible = ref(true)
+const globalState = useGlobalState()
 
 const close = () => {
-  visible.value = false
+  globalState.hideNotification()
 }
 
 let timer
 
-onMounted(() => {
+const startTimer = () => {
+  clearTimeout(timer)
   timer = setTimeout(() => {
     close()
   }, 5000)
+}
+
+onMounted(() => {
+  if (globalState.notification.value) {
+    startTimer()
+  }
 })
 
 onUnmounted(() => {
   clearTimeout(timer)
 })
+
+watch(
+  () => globalState.notification.value,
+  (newValue) => {
+    if (newValue) {
+      startTimer()
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -42,7 +52,7 @@ onUnmounted(() => {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #cb0a0a;
+  background-color: darken(#cb0a0a, 10%);
   color: #17171a;
   font-weight: 500;
   padding: 20px;
@@ -63,7 +73,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-/* Анимация появления и исчезновения */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s, transform 0.3s;

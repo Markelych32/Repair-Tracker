@@ -36,7 +36,19 @@
           </div>
         </div>
 
-        <FilledButton btn-text="New task ＋" @click="addNewTask()" />
+        <div class="new-task">
+          <select class="input" id="title" v-model="selectedTitle">
+            <option
+              v-for="title in titles.types"
+              :key="title.id"
+              :value="title.name"
+            >
+              {{ title.name }}
+            </option>
+          </select>
+
+          <FilledButton btn-text="New task ＋" @click="addNewTask()" />
+        </div>
       </div>
       <div class="list" v-for="task in filteredTasks" :key="task.id">
         <Task :task="task" />
@@ -58,10 +70,17 @@ import { useGlobalState } from '@/stores/GlobalStore'
 import router from '@/router'
 import { computed, onMounted, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
+import AXIOS from '../axios.js'
 
+const titles = ref([])
 const taskStore = useTaskStore()
 const globalState = useGlobalState()
-const addNewTask = (id = uuidv4()) => taskStore.addNewTask(id)
+const selectedTitle = ref(titles[0])
+
+const addNewTask = (id = uuidv4()) => {
+  taskStore.addNewTask(id, selectedTitle.value)
+  taskStore.saveNewTask(id, selectedTitle.value, null, false)
+}
 
 const authorized = computed(() => {
   return !!globalState.token.value
@@ -77,8 +96,24 @@ const updateTasks = (mode) => {
   currentMode.value = mode
 }
 
+const fetchTitles = async () => {
+  try {
+    const response = await AXIOS.get('/tasks/types', {
+      headers: {
+        Authorization: `Bearer ${globalState.token.value}`,
+      },
+    })
+
+    titles.value = response.data
+    selectedTitle.value = titles.value.types[0].name
+  } catch (e) {
+    globalState.showNotification('You are not authorized! Please log in.')
+  }
+}
+
 onMounted(() => {
   taskStore.fetchData()
+  fetchTitles()
 })
 </script>
 
@@ -86,6 +121,39 @@ onMounted(() => {
 $main-bg-color: #17171a;
 $elem-bg-color: #3e4045;
 $accent-color: #cb0a0a;
+
+.new-task {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  color: $accent-color;
+  font-size: 20px;
+  font-weight: 500;
+  font-family: Gilroy;
+  background-color: $elem-bg-color;
+  border: 2px solid $accent-color;
+  border-radius: 5px;
+  padding: 6px;
+  margin-right: 3px;
+  outline: none;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0px 2px 8px #212121;
+  }
+}
+
+option {
+  background-color: $elem-bg-color;
+  outline: none;
+  border: none;
+  border-radius: 0px;
+  box-shadow: none;
+}
 
 .header {
   display: flex;
@@ -102,7 +170,7 @@ $accent-color: #cb0a0a;
 }
 
 h2 {
-  margin: 20px 0;
+  margin: 30px 0;
   color: $accent-color;
   font-size: 28px;
 }

@@ -1,24 +1,23 @@
 <template>
-  <div class="task" @click="popupShowing = !popupShowing">
-    <h3
-      v-if="props.task.title && !editing"
-      @click.stop="editing = !editing"
-      class="title"
-    >
+  <div class="task" @click="changePopupVisibility()">
+    <h3 v-if="!editing" @click.stop="editing = !editing" class="title">
       {{ props.task.title }}
     </h3>
-    <input
+
+    <select
       v-else
-      type="text"
       class="input"
       @click.stop
       id="title"
-      placeholder="Title"
-      :value="props.task.title"
-      @keyup.enter="editing = !editing"
-      @change="editTitle()"
-    />
-    <div class="checkbox" v-if="!editing">
+      v-model="props.task.title"
+      @input="editTitle()"
+    >
+      <option v-for="title in titles.types" :key="title.id" :value="title.name">
+        {{ title.name }}
+      </option>
+    </select>
+
+    <div class="checkbox" v-if="props.task.title !== null">
       <input
         class="checkbox-input"
         type="checkbox"
@@ -30,19 +29,57 @@
       />
       <label class="checkbox-label" for="done"></label>
     </div>
-    <button @click.stop="deleteTask()" class="delete">
-      <img src="../assets/delete.png" alt="" />
+
+    <button
+      @click.stop="deleteTask()"
+      class="delete"
+      v-if="props.task.title !== null"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        x="0px"
+        y="0px"
+        width="35"
+        height="35"
+        viewBox="0,0,256,256"
+      >
+        <g
+          fill="#cb0a0a"
+          fill-rule="nonzero"
+          stroke="none"
+          stroke-width="1"
+          stroke-linecap="butt"
+          stroke-linejoin="miter"
+          stroke-miterlimit="10"
+          stroke-dasharray=""
+          stroke-dashoffset="0"
+          font-family="none"
+          font-weight="none"
+          font-size="none"
+          text-anchor="none"
+          style="mix-blend-mode: normal"
+        >
+          <g transform="scale(5.12,5.12)">
+            <path
+              d="M21,2c-1.64545,0 -3,1.35455 -3,3v2h-7.8457c-0.05615,-0.00939 -0.113,-0.01396 -0.16992,-0.01367c-0.04844,0.00105 -0.09675,0.00562 -0.14453,0.01367h-1.83984c-0.36064,-0.0051 -0.69608,0.18438 -0.87789,0.49587c-0.18181,0.3115 -0.18181,0.69676 0,1.00825c0.18181,0.3115 0.51725,0.50097 0.87789,0.49587h1v36c0,1.64545 1.35455,3 3,3h26c1.64545,0 3,-1.35455 3,-3v-36h1c0.36064,0.0051 0.69608,-0.18438 0.87789,-0.49587c0.18181,-0.3115 0.18181,-0.69676 0,-1.00825c-0.18181,-0.3115 -0.51725,-0.50097 -0.87789,-0.49587h-1.83203c-0.10799,-0.01785 -0.21818,-0.01785 -0.32617,0h-7.8418v-2c0,-1.64545 -1.35455,-3 -3,-3zM21,4h8c0.55455,0 1,0.44545 1,1v2h-10v-2c0,-0.55455 0.44545,-1 1,-1zM11,9h7.83203c0.10799,0.01785 0.21818,0.01785 0.32617,0h11.67383c0.10799,0.01785 0.21818,0.01785 0.32617,0h7.8418v36c0,0.55454 -0.44546,1 -1,1h-26c-0.55454,0 -1,-0.44546 -1,-1zM18.98438,13.98633c-0.55152,0.00862 -0.99193,0.46214 -0.98437,1.01367v25c-0.0051,0.36064 0.18438,0.69608 0.49587,0.87789c0.3115,0.18181 0.69676,0.18181 1.00825,0c0.3115,-0.18181 0.50097,-0.51725 0.49587,-0.87789v-25c0.0037,-0.2703 -0.10218,-0.53059 -0.29351,-0.72155c-0.19133,-0.19097 -0.45182,-0.29634 -0.72212,-0.29212zM24.98438,13.98633c-0.55152,0.00862 -0.99193,0.46214 -0.98437,1.01367v25c-0.0051,0.36064 0.18438,0.69608 0.49587,0.87789c0.3115,0.18181 0.69676,0.18181 1.00825,0c0.3115,-0.18181 0.50097,-0.51725 0.49587,-0.87789v-25c0.0037,-0.2703 -0.10218,-0.53059 -0.29351,-0.72155c-0.19133,-0.19097 -0.45182,-0.29634 -0.72212,-0.29212zM30.98438,13.98633c-0.55152,0.00862 -0.99193,0.46214 -0.98437,1.01367v25c-0.0051,0.36064 0.18438,0.69608 0.49587,0.87789c0.3115,0.18181 0.69676,0.18181 1.00825,0c0.3115,-0.18181 0.50097,-0.51725 0.49587,-0.87789v-25c0.0037,-0.2703 -0.10218,-0.53059 -0.29351,-0.72155c-0.19133,-0.19097 -0.45182,-0.29634 -0.72212,-0.29212z"
+            ></path>
+          </g>
+        </g>
+      </svg>
     </button>
-    <div class="task-popup" v-if="popupShowing && !editing">
+
+    <div class="task-popup" v-if="props.task.title !== null && popupShowing">
       <div @click.stop class="edit-form">
         <h2>Task editing</h2>
-        <input
-          type="text"
-          class="input"
-          id="title-edit"
-          :value="props.task.title"
-          placeholder="Title"
-        />
+        <select class="input" @click.stop id="title" v-model="props.task.title">
+          <option
+            v-for="title in titles.types"
+            :key="title.id"
+            :value="title.name"
+          >
+            {{ title.name }}
+          </option>
+        </select>
         <textarea
           type="text"
           class="payload-edit input"
@@ -73,9 +110,11 @@
 
 <script setup>
 import { useTaskStore } from '@/stores/TaskStore'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import FilledButton from './FilledButton.vue'
 import OutlinedButton from './OutlinedButton.vue'
+import { useGlobalState } from '@/stores/GlobalStore'
+import AXIOS from '../axios.js'
 
 const props = defineProps({
   task: Object,
@@ -84,6 +123,13 @@ const taskStore = useTaskStore()
 const isDone = ref(props.task.is_done)
 const editing = ref(false)
 const popupShowing = ref(false)
+const titles = ref([])
+
+const globalState = useGlobalState()
+
+const changePopupVisibility = () => {
+  if (props.task.title) popupShowing.value = !popupShowing.value
+}
 
 const deleteTask = (id = props.task.id) => {
   taskStore.deleteTask(id)
@@ -109,7 +155,7 @@ const editTitle = async (
 
 const editTask = (
   id = props.task.id,
-  title = document.getElementById('title-edit').value,
+  title = props.task.title,
   payload = document.getElementById('payload-edit').value,
   is_done = document.getElementById('done-edit').checked
 ) => {
@@ -117,6 +163,23 @@ const editTask = (
   popupShowing.value = !popupShowing.value
   isDone.value = is_done
 }
+
+const fetchTitles = async () => {
+  try {
+    const response = await AXIOS.get('/tasks/types', {
+      headers: {
+        Authorization: `Bearer ${globalState.token.value}`,
+      },
+    })
+    titles.value = response.data
+  } catch (e) {
+    globalState.showNotification('You are not authorized! Please log in.')
+  }
+}
+
+onMounted(() => {
+  fetchTitles()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -131,7 +194,7 @@ $accent-color: #cb0a0a;
   align-items: center;
   position: relative;
   display: flex;
-  padding: 30px;
+  padding: 25px;
   margin: 15px 0;
   gap: 20px;
 
@@ -145,6 +208,7 @@ h3 {
   font-size: 20px;
   font-weight: 500;
   font-family: Gilroy;
+  margin: 14.4px 0;
 }
 
 h2 {
@@ -162,10 +226,12 @@ h2 {
   margin-left: auto;
   opacity: 0;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: 0.2s;
+  border-radius: 5px;
+  padding: 3px;
 
-  img {
-    width: 28px;
+  &:hover {
+    background-color: darken($elem-bg-color, 10%);
   }
 }
 
@@ -267,5 +333,8 @@ h2 {
   resize: vertical;
   min-height: 60px;
   max-height: 250px;
+}
+option {
+  background-color: $elem-bg-color;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div class="login">
-    <Notification :message="notificationMessage" v-if="show" />
     <Header />
     <form>
       <h2>LOG IN</h2>
@@ -35,29 +34,11 @@ import Header from '@/components/Header.vue'
 import Notification from '@/components/Notification.vue'
 import router from '@/router'
 import { useGlobalState } from '@/stores/GlobalStore'
-import { ref, onUnmounted } from 'vue'
+import { ref } from 'vue'
 
 const email = ref('')
 const password = ref('')
 const globalState = useGlobalState()
-
-const show = ref(false)
-const notificationMessage = ref('')
-
-let timer
-
-const showMessage = (text) => {
-  show.value = true
-  notificationMessage.value = text
-
-  timer = setTimeout(() => {
-    show.value = false
-  }, 5300)
-}
-
-onUnmounted(() => {
-  clearTimeout(timer)
-})
 
 const submit = async () => {
   const url = 'http://localhost:8081/auth/login'
@@ -73,7 +54,7 @@ const submit = async () => {
     globalState.setUserId(response.data.user_id)
     router.push('/')
   } catch (error) {
-    showMessage('Invalid email or password, please try again!')
+    globalState.showNotification('Invalid email or password, please try again!')
   }
 }
 </script>

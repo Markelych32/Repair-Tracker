@@ -24,50 +24,61 @@ export const useTaskStore = defineStore('TaskStore', {
         )
 
         this.tasks = response.data.tasks
-      } catch (e) {}
+      } catch (e) {
+        globalState.showNotification('You are not authorized! Please log in.')
+      }
     },
     async sendData(id, title, payload, isDone) {
-      await AXIOS.put(
-        '/tasks',
-        {
-          user_id: Number(globalState.userId.value),
-          task_id: id,
-          title: title,
-          payload: payload,
-          is_done: isDone,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${globalState.token.value}`,
+      try {
+        await AXIOS.put(
+          '/tasks',
+          {
+            user_id: Number(globalState.userId.value),
+            task_id: id,
+            title: title,
+            payload: payload,
+            is_done: isDone,
           },
-        }
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${globalState.token.value}`,
+            },
+          }
+        )
+      } catch (e) {
+        globalState.showNotification('You are not authorized! Please log in.')
+        this.tasks = this.tasks.filter((task) => task.id !== id)
+      }
     },
-    addNewTask(id) {
+    addNewTask(id, title) {
       this.tasks.push({
         id: id,
-        title: null,
+        title: title,
         payload: null,
-        isDone: false,
+        is_done: false,
       })
     },
 
     async saveNewTask(id, title, payload, isDone) {
-      await AXIOS.post(
-        '/tasks',
-        {
-          task_id: id,
-          user_id: Number(globalState.userId.value),
-          title: title,
-          payload: payload,
-          isDone: isDone,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${globalState.token.value}`,
+      try {
+        await AXIOS.post(
+          '/tasks',
+          {
+            task_id: id,
+            user_id: Number(globalState.userId.value),
+            title: title,
+            payload: payload,
+            is_done: isDone,
           },
-        }
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${globalState.token.value}`,
+            },
+          }
+        )
+      } catch (e) {
+        globalState.showNotification('You are not authorized! Please log in.')
+      }
     },
 
     async editTask(id, title, payload, isDone) {
@@ -76,7 +87,7 @@ export const useTaskStore = defineStore('TaskStore', {
       if (target) {
         target.title = title
         target.payload = payload
-        target.isDone = isDone
+        target.is_done = isDone
 
         await this.sendData(id, title, payload, isDone)
       }
@@ -85,7 +96,7 @@ export const useTaskStore = defineStore('TaskStore', {
     async editIsDone(id, isDone) {
       const target = this.tasks.find((task) => task.id === id)
       if (target) {
-        target.isDone = isDone
+        target.is_done = isDone
 
         this.sendData(id, target.title, target.payload, isDone)
       }

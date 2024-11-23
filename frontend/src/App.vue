@@ -1,6 +1,13 @@
 <template>
-  <router-view />
+  <div>
+    <Notification />
+    <router-view />
+  </div>
 </template>
+
+<script setup>
+import Notification from './components/Notification.vue'
+</script>
 
 <style lang="scss">
 $main-bg-color: #17171a;

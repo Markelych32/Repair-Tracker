@@ -1,6 +1,5 @@
 <template>
   <div class="register">
-    <Notification :message="notificationMessage" v-if="show" />
     <Header />
     <form>
       <h2>REGISTER</h2>
@@ -52,30 +51,14 @@ import FilledButton from '@/components/FilledButton.vue'
 import Header from '@/components/Header.vue'
 import router from '@/router'
 import Notification from '@/components/Notification.vue'
-import { ref, onUnmounted } from 'vue'
+import { useGlobalState } from '@/stores/GlobalStore'
+import { ref } from 'vue'
 
 const email = ref('')
 const password = ref('')
 const firstname = ref('')
 const lastname = ref('')
-const errorMessage = ref('')
-const show = ref(false)
-const notificationMessage = ref('')
-
-let timer
-
-const showMessage = (text) => {
-  show.value = true
-  notificationMessage.value = text
-
-  timer = setTimeout(() => {
-    show.value = false
-  }, 5300)
-}
-
-onUnmounted(() => {
-  clearTimeout(timer)
-})
+const globalState = useGlobalState()
 
 const submit = async () => {
   const url = 'http://localhost:8081/auth/register'
@@ -90,7 +73,7 @@ const submit = async () => {
     const response = await AXIOS.post(url, userData)
     router.push('/login')
   } catch (error) {
-    showMessage(
+    globalState.showNotification(
       'User with this email has already been registered, try again please try again!'
     )
   }
