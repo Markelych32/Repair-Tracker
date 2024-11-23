@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.solonchev.backend.dto.Error;
 import ru.solonchev.backend.dto.task.request.TaskSaveDto;
+import ru.solonchev.backend.dto.task.response.ListTitleTypeDto;
 import ru.solonchev.backend.dto.task.response.TaskResponseDto;
 
 import java.util.UUID;
@@ -104,7 +105,7 @@ public interface TaskController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Успешное получение типов задач",
-                            content = @Content(schema = @Schema(implementation = String.class))
+                            content = @Content(schema = @Schema(implementation = ListTitleTypeDto.class))
                     )
             }
     )
