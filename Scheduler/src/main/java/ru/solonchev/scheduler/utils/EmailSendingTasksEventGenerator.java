@@ -7,7 +7,7 @@ import ru.solonchev.scheduler.config.dto.AnalyseResponseDto;
 
 public final class EmailSendingTasksEventGenerator {
 
-    private static final String HEADER_OF_LETTER = "Spring Dashboard: Daily Analyse";
+    private static final String HEADER_OF_LETTER = "Repair Tracker: Daily Analyse";
 
     private EmailSendingTasksEventGenerator() {
 
