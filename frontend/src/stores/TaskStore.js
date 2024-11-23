@@ -8,7 +8,6 @@ export const useTaskStore = defineStore('TaskStore', {
   state: () => {
     return {
       tasks: [],
-      tasks: [],
     }
   },
 
