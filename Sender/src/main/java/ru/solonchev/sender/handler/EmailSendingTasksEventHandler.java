@@ -20,6 +20,8 @@ public class EmailSendingTasksEventHandler {
     @KafkaHandler
     public void handle(@Payload EmailSendingTasksEvent event) {
         log.info("Get Event: {}", event);
-        notificationEmailSender.send(event);
+        if (!(event.finished().isEmpty() && event.active().isEmpty())) {
+            notificationEmailSender.send(event);
+        }
     }
 }

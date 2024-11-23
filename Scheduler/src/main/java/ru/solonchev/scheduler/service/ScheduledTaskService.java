@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import ru.solonchev.scheduler.config.dto.AnalyseResponseDto;
 import ru.solonchev.scheduler.repository.UserRepository;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -24,8 +26,9 @@ public class ScheduledTaskService {
         });
     }
 
-    @Scheduled(fixedDelay = 20_000)
+    @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void testScheduledMethod() {
+        log.info("Scheduler is checking users.");
         userRepository.findAll().forEach(user -> {
             AnalyseResponseDto response = userAnalyseService.analyse(user);
             emailSendingKafkaService.sendEmailMessage(response);

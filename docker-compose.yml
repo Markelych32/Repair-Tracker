@@ -45,6 +45,8 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
       - kafka-1:/bitnami/kafka
+    networks:
+      - backend
 
   kafka-2:
     image: bitnami/kafka:3.6.2
@@ -62,6 +64,8 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
       - kafka-2:/bitnami/kafka
+    networks:
+      - backend
 
   kafka-3:
     image: bitnami/kafka:3.6.2
@@ -79,12 +83,14 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
       - kafka-3:/bitnami/kafka
+    networks:
+      - backend
 
   backend:
     networks:
       - backend
     build:
-      dockerfile: Dockerfile
+      dockerfile: Backend/Dockerfile
       args:
         JAR_FILE: Backend/target/Backend-0.0.1-SNAPSHOT.jar
     container_name: backend-service
@@ -96,3 +102,41 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - database
+
+  scheduler:
+    networks:
+      - backend
+    build:
+      dockerfile: Scheduler/Dockerfile
+      args:
+        JAR_FILE: Scheduler/target/Scheduler-0.0.1-SNAPSHOT.jar
+    container_name: scheduler-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka-1:9092, kafka-2:9094, kafka-3:9096
+    depends_on:
+      - database
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+  email-sender:
+    networks:
+      - backend
+    build:
+      dockerfile: Sender/Dockerfile
+      args:
+        JAR_FILE: Sender/target/Sender-0.0.1-SNAPSHOT.jar
+    container_name: email-sender-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka-1:9092, kafka-2:9094, kafka-3:9096
+    depends_on:
+      - scheduler
