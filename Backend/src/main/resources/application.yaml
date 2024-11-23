@@ -1,0 +1,25 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: Backend
+  datasource:
+    password: ${POSTGRES_PASSWORD}
+    username: ${POSTGRES_USER}
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/postgres
+  jpa:
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+springdoc:
+  swagger-ui:
+    path: /swagger
+server:
+  port: ${BACKEND_SERVER_PORT:8081}
+backend:
+  app:
+    secret-key: ${BACKEND_APP_SECRET_KEY:[NF8@9u89pq%we0i9[fq@[mwetpof98qn9&@y84tn@9u8vnu93*qtunp4v}
+    expiration-ms: ${BACKEND_APP_EXPIRATION_KEY_MS:1800000}

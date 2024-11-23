@@ -1,0 +1,7 @@
+,-----.               ,--.                     ,--.
+|  |) /_  ,--,--.,---.|  |,-. ,---. ,--,--,  ,-|  |
+|  .-.  \' ,-.  | .--'|     /| .-. :|      \' .-. |
+|  '--' /\ '-'  \ `--.|  \  \\   --.|  ||  |\ `-' |
+`------'  `--`--'`---'`--'`--'`----'`--''--' `---'
+${BACKEND_APPLICATION_NAME: Backend Service} ${application.versio:V1.0.0}
+Powered by Spring Boot ${spring-boot.version}

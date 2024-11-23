@@ -1,0 +1,24 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: Sender
+  kafka:
+    consumer:
+      group-id: email-sending-tasks-events
+      bootstrap-servers: localhost:9092,localhost:9094
+      properties:
+        spring.json.trusted.packages: ru.solonchev.event
+  mail:
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    host: smtp.gmail.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    port: 587
+server:
+  port: 8083
