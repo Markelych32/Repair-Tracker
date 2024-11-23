@@ -18,12 +18,12 @@
       @keyup.enter="editing = !editing"
       @change="editTitle()"
     />
-    <div class="checkbox">
+    <div class="checkbox" v-if="!editing">
       <input
         class="checkbox-input"
         type="checkbox"
         id="done"
-        :checked="props.task.isDone"
+        :checked="props.task.is_done"
         v-model="isDone"
         @click.stop
         @change="editIsDone(props.task.id, isDone)"
@@ -33,7 +33,7 @@
     <button @click.stop="deleteTask()" class="delete">
       <img src="../assets/delete.png" alt="" />
     </button>
-    <div class="task-popup" v-if="popupShowing">
+    <div class="task-popup" v-if="popupShowing && !editing">
       <div @click.stop class="edit-form">
         <h2>Task editing</h2>
         <input
@@ -56,7 +56,7 @@
             class="checkbox-input"
             type="checkbox"
             id="done-edit"
-            :checked="props.task.isDone"
+            :checked="isDone"
           />
         </div>
         <div class="buttons">
@@ -81,7 +81,7 @@ const props = defineProps({
   task: Object,
 })
 const taskStore = useTaskStore()
-const isDone = ref(props.task.isDone)
+const isDone = ref(props.task.is_done)
 const editing = ref(false)
 const popupShowing = ref(false)
 
@@ -111,10 +111,11 @@ const editTask = (
   id = props.task.id,
   title = document.getElementById('title-edit').value,
   payload = document.getElementById('payload-edit').value,
-  isDone = document.getElementById('done-edit').checked
+  is_done = document.getElementById('done-edit').checked
 ) => {
-  taskStore.editTask(id, title, payload, isDone)
+  taskStore.editTask(id, title, payload, is_done)
   popupShowing.value = !popupShowing.value
+  isDone.value = is_done
 }
 </script>
 

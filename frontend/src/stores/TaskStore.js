@@ -27,9 +27,15 @@ export const useTaskStore = defineStore('TaskStore', {
       } catch (e) {}
     },
     async sendData(id, title, payload, isDone) {
-      const response = await AXIOS.put(
+      await AXIOS.put(
         '/tasks',
-        { task_id: id, title: title, payload: payload, isDone: isDone },
+        {
+          user_id: Number(globalState.userId.value),
+          task_id: id,
+          title: title,
+          payload: payload,
+          is_done: isDone,
+        },
         {
           headers: {
             Authorization: `Bearer ${globalState.token.value}`,
@@ -51,7 +57,7 @@ export const useTaskStore = defineStore('TaskStore', {
         '/tasks',
         {
           task_id: id,
-          user_id: globalState.userId.value,
+          user_id: Number(globalState.userId.value),
           title: title,
           payload: payload,
           isDone: isDone,
@@ -74,14 +80,6 @@ export const useTaskStore = defineStore('TaskStore', {
 
         await this.sendData(id, title, payload, isDone)
       }
-
-      if (target) {
-        target.title = title
-        target.payload = payload
-        target.isDone = isDone
-
-        await this.sendData(id, title, payload, isDone)
-      }
     },
 
     async editIsDone(id, isDone) {
@@ -91,20 +89,10 @@ export const useTaskStore = defineStore('TaskStore', {
 
         this.sendData(id, target.title, target.payload, isDone)
       }
-      if (target) {
-        target.isDone = isDone
-
-        this.sendData(id, target.title, target.payload, isDone)
-      }
     },
 
     async editTitle(id, title) {
       const target = this.tasks.find((task) => task.id === id)
-      if (target) {
-        target.title = title
-
-        this.sendData(id, title, target.payload, target.isDone)
-      }
       if (target) {
         target.title = title
 
@@ -121,13 +109,6 @@ export const useTaskStore = defineStore('TaskStore', {
           taskId: id,
         },
       })
-
-      await AXIOS.delete(`/tasks`, {
-        headers: {
-          Authorization: `Bearer ${globalState.token.value}`,
-          taskId: id,
-        },
-      })
     },
   },
 
@@ -136,13 +117,13 @@ export const useTaskStore = defineStore('TaskStore', {
       return state.tasks || []
     },
     completedTasks(state) {
-      return state.tasks.filter((task) => task.isDone) || []
+      return state.tasks.filter((task) => task.is_done) || []
     },
     totalTasks(state) {
       return state.tasks.length
     },
     activeTasks(state) {
-      return state.tasks.filter((task) => !task.isDone) || []
+      return state.tasks.filter((task) => !task.is_done) || []
     },
   },
 })
