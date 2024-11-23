@@ -1,24 +1,46 @@
 <template>
   <div class="register">
+    <Notification :message="notificationMessage" v-if="show" />
     <Header />
     <form>
-      <div>
-        <label for="firstname">FirstName:</label>
-        <input type="text" id="firstname" v-model="firstname" required />
-      </div>
-      <div>
-        <label for="lastname">LastName:</label>
-        <input type="text" id="lastname" v-model="lastname" required />
-      </div>
-      <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-      <div>
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <FilledButton @click="submit" btnText="Log In" />
+      <h2>REGISTER</h2>
+      <input
+        type="text"
+        id="firstname"
+        v-model="firstname"
+        required
+        placeholder="FirstName"
+      />
+      <input
+        type="text"
+        id="lastname"
+        v-model="lastname"
+        required
+        placeholder="LastName"
+      />
+      <input
+        type="email"
+        id="email"
+        v-model="email"
+        required
+        placeholder="Email"
+      />
+      <input
+        type="password"
+        id="password"
+        v-model="password"
+        required
+        placeholder="Password"
+      />
+      <FilledButton
+        style="width: 40%; padding: 15px; font-size: 20px; margin-top: 10px"
+        @click="submit"
+        btnText="Register"
+      />
+      <p>
+        Already have an account?
+        <span @click="router.push('/login')">Log in</span>
+      </p>
     </form>
     <p v-if="errorMessage" style="color: red">{{ errorMessage }}</p>
   </div>
@@ -28,37 +50,123 @@
 import AXIOS from '@/axios'
 import FilledButton from '@/components/FilledButton.vue'
 import Header from '@/components/Header.vue'
-
-import { ref } from 'vue'
+import router from '@/router'
+import Notification from '@/components/Notification.vue'
+import { ref, onUnmounted } from 'vue'
 
 const email = ref('')
 const password = ref('')
 const firstname = ref('')
 const lastname = ref('')
 const errorMessage = ref('')
+const show = ref(false)
+const notificationMessage = ref('')
 
-async function submit() {
-  const response = AXIOS.post('http://localhost:8081/auth/register', {
+let timer
+
+const showMessage = (text) => {
+  show.value = true
+  notificationMessage.value = text
+
+  timer = setTimeout(() => {
+    show.value = false
+  }, 5300)
+}
+
+onUnmounted(() => {
+  clearTimeout(timer)
+})
+
+const submit = async () => {
+  const url = 'http://localhost:8081/auth/register'
+  const userData = {
     first_name: firstname.value,
     last_name: lastname.value,
     email: email.value,
     password: password.value,
-  })
+  }
 
-  console.log(response)
+  try {
+    const response = await AXIOS.post(url, userData)
+    router.push('/login')
+  } catch (error) {
+    showMessage(
+      'User with this email has already been registered, try again please try again!'
+    )
+  }
 }
 </script>
 
 <style scoped lang="scss">
 $main-bg-color: #17171a;
 $elem-bg-color: #3e4045;
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
+
+.register {
+  min-height: 100vh;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+p {
+  font-size: 16px;
+  color: lighten($elem-bg-color, 30%);
+
+  span {
+    cursor: pointer;
+    color: $accent-color;
+  }
+}
+
+h2 {
+  color: $accent-color;
+  font-weight: 600;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.register {
+  min-height: 100vh;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+p {
+  font-size: 16px;
+  color: lighten($elem-bg-color, 30%);
+
+  span {
+    cursor: pointer;
+    color: $accent-color;
+  }
+}
+
+h2 {
+  color: $accent-color;
+  font-weight: 600;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
 
 form {
-  max-width: 300px;
+  width: 35%;
+  width: 35%;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 5%;
 }
+
 input {
+  width: 100%;
+  width: 100%;
   color: $accent-color;
   font-size: 20px;
   font-weight: 500;

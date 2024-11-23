@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
-$accent-color: #eab629;
+$accent-color: #cb0a0a;
 
 .button {
   background-color: $accent-color;
@@ -19,6 +19,7 @@ $accent-color: #eab629;
   cursor: pointer;
   transition: 0.2s;
   font-weight: 600;
+  text-align: center;
 
   &:hover {
     transform: scale(0.95);
